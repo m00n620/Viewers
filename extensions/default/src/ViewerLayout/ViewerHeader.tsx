@@ -99,6 +99,33 @@ function ViewerHeader({ hotkeysManager, extensionManager, servicesManager, appCo
     });
   }
 
+  const handleSwapViewports = () => {
+    const { cornerstoneViewportService } = servicesManager.services;
+
+    const viewportIds = cornerstoneViewportService.getViewportIds();
+    const viewportInfos = viewportIds.map(viewportId =>
+      cornerstoneViewportService.getViewportInfo(viewportId)
+    );
+
+    if (viewportInfos.length < 5) {
+      return;
+    }
+
+    const sourceViewportInfo = viewportInfos[4];
+    const targetViewportInfo = viewportInfos[3];
+
+    const sourceViewportData = sourceViewportInfo.viewportData;
+    const sourceViewportOptions = sourceViewportInfo.viewportOptions;
+    const sourceDisplaySetOptions = sourceViewportInfo.displaySetOptions;
+
+    const targetViewportId = targetViewportInfo.viewportId;
+    const targetViewportOptions = targetViewportInfo.viewportOptions;
+    const targetPresentations = cornerstoneViewportService.getPresentations(targetViewportId);
+
+    cornerstoneViewportService.updateViewport(targetViewportId, sourceViewportData);
+    cornerstoneViewportService.setPresentations(targetViewportId, targetPresentations);
+  };
+
   return (
     <Header
       menuOptions={menuOptions}
@@ -118,6 +145,7 @@ function ViewerHeader({ hotkeysManager, extensionManager, servicesManager, appCo
       <ErrorBoundary context="Primary Toolbar">
         <div className="relative flex justify-center gap-[4px]">
           <Toolbar servicesManager={servicesManager} />
+          <button onClick={handleSwapViewports}>swap viewports</button>
         </div>
       </ErrorBoundary>
     </Header>
